@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Backroom Quote Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f8fb;--surface:#fff;--ink:#14294a;--muted:#54647c;--line:#dde4ee;--blue:#0a6cff;--logo:#14294a;--field:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1b2f;--surface:#152741;--ink:#eaf0f8;--muted:#9fb0c7;--line:#243a5a;--logo:#eaf0f8;--field:#0f2038}}
+:root[data-theme="dark"]{--bg:#0d1b2f;--surface:#152741;--ink:#eaf0f8;--muted:#9fb0c7;--line:#243a5a;--logo:#eaf0f8;--field:#0f2038}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Outfit',system-ui,sans-serif;font-size:16px;line-height:1.5}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:6px}
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--line);background:var(--surface)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;letter-spacing:-.02em}
+.brand svg{width:40px;height:27px}
+.app{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;max-width:1160px;margin:0 auto;padding:24px}
+.col{display:flex;flex-direction:column;gap:20px;min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
+h2{margin:0 0 12px;font-size:19px;letter-spacing:-.01em}
+label{display:block;font-size:14px;font-weight:600;color:var(--muted);margin-bottom:4px}
+input,textarea,select{width:100%;font:inherit;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--field);color:var(--ink)}
+textarea{min-height:76px;resize:vertical}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.mb{margin-bottom:12px}
+button{font:inherit;font-weight:600;cursor:pointer;border-radius:999px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:8px 16px}
+button:hover{background:var(--ink);color:var(--bg)}
+button.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+button.pri:hover{filter:brightness(1.1);background:var(--blue)}
+button.sm{padding:4px 12px;font-size:14px}
+.pb{display:flex;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.pb .n{flex:1;min-width:0}.pb .p{color:var(--muted);white-space:nowrap}
+.x{border:0;padding:2px 8px;font-size:18px;color:var(--muted)}
+.x:hover{background:transparent;color:#d33}
+.ln{display:grid;grid-template-columns:1fr 64px 96px 28px;gap:8px;align-items:center;margin-bottom:8px}
+.ln input{padding:8px}
+.tot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:12px;border-top:2px solid var(--ink);font-weight:800;font-size:22px}
+.row{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.hint{color:var(--muted);font-size:14px;margin:8px 0 0}
+.empty{color:var(--muted);padding:8px 0}
+.doc{border:1px solid var(--line);border-radius:12px;padding:20px;background:#fff;color:#14294a}
+.doc h3{margin:0;font-size:22px}.doc .meta{color:#54647c;font-size:14px;margin-bottom:12px}
+.doc .r{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid #dde4ee}
+.doc .r.t{border-top:2px solid #14294a;font-weight:800;font-size:18px}
+.doc small{color:#54647c;display:block;margin-top:12px}
+.msg{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--field)}
+.msg b{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:15px}
+.msg p{margin:0;white-space:pre-wrap;font-size:15px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 20px;border-radius:999px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+@media(max-width:860px){.app{grid-template-columns:1fr;padding:16px}.ln{grid-template-columns:1fr 56px 84px 28px}}
+@media print{body{background:#fff}header,.col:first-child,.noprint{display:none!important}.app{display:block;padding:0}.panel{border:0;padding:0}.doc{border:0}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="mark" viewBox="0 0 560 380"><g transform="translate(-530,-170)"><path fill="var(--logo)" d="M690 170H925C1000 170 1042 225 1042 285C1042 315 1033 330 1022 342C1060 358 1082 395 1082 435C1082 500 1030 548 965 548H668Q648 548 654 530L684 462H866Q870 486 895 486Q905 486 915 476L1005 392Q1018 378 1012 360Q1008 350 1000 345L915 262Q905 253 893 253H697L668 188Q664 170 690 170Z"/><path fill="var(--logo)" stroke="var(--logo)" stroke-width="10" stroke-linejoin="round" d="M885 292L975 372L889 450V408H720L744 344H885Z"/><rect x="562" y="273" width="190" height="45" rx="22.5" fill="#0a6cff"/><rect x="594" y="336" width="113" height="45" rx="22.5" fill="#0a6cff"/><rect x="533" y="398" width="145" height="45" rx="22.5" fill="#0a6cff"/></g></symbol></svg>
+<header><div class="brand"><svg aria-hidden="true"><use href="#mark"/></svg>Backroom <span style="font-weight:500;color:var(--muted);font-size:16px">Quote Builder</span></div><button id="reset" class="sm">New quote</button></header>
+
+<main class="app">
+<div class="col">
+  <section class="panel">
+    <h2>1. The job</h2>
+    <div class="g2"><div><label for="co">Your company</label><input id="co" value="Your Company"></div><div><label for="cu">Customer name</label><input id="cu" placeholder="Maria Alvarez"></div></div>
+    <div class="mb"><label for="jb">Job description</label><textarea id="jb" placeholder="Water heater is leaking, 50 gal gas tank, needs replacing and old one hauled away"></textarea></div>
+    <div class="row"><button id="draft" class="pri">Draft quote from description</button><span class="hint" style="margin:0">Matches keywords to your price book.</span></div>
+  </section>
+  <section class="panel">
+    <h2>2. Price book</h2>
+    <div id="pb"></div>
+    <form id="addf" class="row" style="margin-top:12px">
+      <div style="flex:2 1 140px"><label for="an">New item</label><input id="an" placeholder="Garbage disposal install" required></div>
+      <div style="flex:1 1 80px"><label for="ap">Price</label><input id="ap" type="number" min="0" step="1" placeholder="240" required></div>
+      <button class="sm" type="submit">Add</button>
+    </form>
+  </section>
+</div>
+
+<div class="col">
+  <section class="panel">
+    <h2>3. Quote lines</h2>
+    <div id="lines"></div>
+    <div class="row mb"><div style="width:120px"><label for="tx">Tax %</label><input id="tx" type="number" min="0" step="0.1" value="0"></div><button id="custom" class="sm">+ Blank line</button></div>
+    <div class="tot"><span>Total</span><span id="tt">$0</span></div>
+  </section>
+  <section class="panel">
+    <h2>4. Preview</h2>
+    <div class="doc" id="doc"></div>
+    <div class="row noprint" style="margin-top:12px"><button id="print" class="sm">Print or save PDF</button></div>
+  </section>
+  <section class="panel noprint">
+    <h2>5. Send and follow up</h2>
+    <div class="mb" style="max-width:220px"><label for="tone">Tone</label><select id="tone"><option value="f">Friendly</option><option value="d">Direct</option></select></div>
+    <div id="msgs"></div>
+    <p class="hint">Copy each message into your texting app. Automatic sending comes later.</p>
+  </section>
+</div>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+var $=function(i){return document.getElementById(i)};
+var DEF=[
+{n:"Water heater replacement, 50 gal",p:2340,k:"water heater tank"},
+{n:"Tankless water heater install",p:3900,k:"tankless"},
+{n:"Drain clearing",p:225,k:"drain clog clogged backed"},
+{n:"Leak repair",p:320,k:"leak leaking pipe burst"},
+{n:"Toilet repair or replace",p:390,k:"toilet"},
+{n:"AC tune-up",p:129,k:"tune-up tune maintenance"},
+{n:"AC repair, diagnostic and fix",p:480,k:"ac air conditioner cooling not cooling"},
+{n:"Furnace replacement, mid-tier",p:6800,k:"furnace heating heat"},
+{n:"Thermostat, smart, installed",p:280,k:"thermostat"},
+{n:"Outlet or switch replacement",p:145,k:"outlet switch plug"},
+{n:"Panel upgrade, 200 amp",p:2900,k:"panel breaker upgrade"},
+{n:"Ceiling fan install",p:210,k:"fan ceiling"},
+{n:"Haul away and disposal",p:90,k:"haul away old disposal"},
+{n:"Permit fee",p:120,k:"permit"}];
+var S={co:"Your Company",cu:"",jb:"",tx:0,tone:"f",pb:DEF,ln:[]};
+try{var sv=localStorage.getItem("backroom-quote");if(sv){S=Object.assign(S,JSON.parse(sv))}}catch(e){}
+function save(){try{localStorage.setItem("backroom-quote",JSON.stringify(S))}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function $$(n){return "$"+(Math.round(n*100)/100).toLocaleString("en-US",{minimumFractionDigits:0,maximumFractionDigits:2})}
+function sub(){return S.ln.reduce(function(a,l){return a+(+l.q||0)*(+l.p||0)},0)}
+function total(){return sub()*(1+(+S.tx||0)/100)}
+function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on")},1600)}
+
+function rPB(){$("pb").innerHTML=S.pb.map(function(it,i){return '<div class="pb"><span class="n">'+esc(it.n)+'</span><span class="p">'+$$(it.p)+'</span><button class="sm" data-add="'+i+'" aria-label="Add '+esc(it.n)+' to quote">Add</button><button class="x" data-del="'+i+'" aria-label="Remove '+esc(it.n)+' from price book">&times;</button></div>'}).join("")}
+function rLines(){
+  $("lines").innerHTML=S.ln.length?S.ln.map(function(l,i){return '<div class="ln"><input data-f="n" data-i="'+i+'" value="'+esc(l.n)+'" aria-label="Item"><input data-f="q" data-i="'+i+'" type="number" min="0" value="'+l.q+'" aria-label="Quantity"><input data-f="p" data-i="'+i+'" type="number" min="0" value="'+l.p+'" aria-label="Price"><button class="x" data-rm="'+i+'" aria-label="Remove line">&times;</button></div>'}).join(""):'<p class="empty">No lines yet. Add items from your price book or draft from the job description.</p>';
+  rOut()}
+function first(){return (S.cu.trim().split(/\s+/)[0])||"there"}
+function jobTitle(){return S.ln.length?S.ln[0].n.split(",")[0]:"your job"}
+function rOut(){
+  $("tt").textContent=$$(total());
+  var tax=sub()*(+S.tx||0)/100;
+  $("doc").innerHTML='<h3>'+esc(S.co||"Your Company")+'</h3><div class="meta">Quote for '+esc(S.cu||"customer")+'</div>'+(S.jb?'<p style="margin:0 0 10px">'+esc(S.jb)+'</p>':'')+
+   S.ln.map(function(l){return '<div class="r"><span>'+esc(l.n)+((+l.q)>1?' &times; '+l.q:'')+'</span><span>'+$$((+l.q||0)*(+l.p||0))+'</span></div>'}).join("")+
+   (tax?'<div class="r"><span>Tax ('+S.tx+'%)</span><span>'+$$(tax)+'</span></div>':'')+
+   '<div class="r t"><span>Total</span><span>'+$$(total())+'</span></div><small>Valid for 14 days. Reply YES to approve and we will schedule your job.</small>';
+  var f=first(),co=S.co||"us",t=$$(total()),d=S.tone==="d";
+  var M=d?[
+   ["Send now","Hi "+f+", your quote for "+jobTitle()+" is ready: "+t+". Reply YES to approve and I'll get you on the schedule. - "+co],
+   ["Follow-up, day 2","Hi "+f+", checking on the "+t+" quote for "+jobTitle()+". Want me to hold a spot this week? - "+co],
+   ["Follow-up, day 5","Hi "+f+", my schedule is filling up. If you'd like "+jobTitle()+" done soon, reply YES and I'll lock it in. - "+co],
+   ["Last note, day 10","Hi "+f+", last check on your quote. Should I close it out, or do you need changes? - "+co]
+  ]:[
+   ["Send now","Hi "+f+"! Thanks for having us take a look. Your quote for "+jobTitle()+" is "+t+". Happy to answer any questions, and just reply YES when you're ready. - "+co],
+   ["Follow-up, day 2","Hi "+f+", just making sure the quote came through okay. Any questions I can answer? - "+co],
+   ["Follow-up, day 5","Hi "+f+", I know decisions like this take time. I still have openings this week if you'd like to move ahead. - "+co],
+   ["Last note, day 10","Hi "+f+", I'll close out your quote soon so it doesn't clutter your inbox. If you'd like it revised or reopened later, just text me. - "+co]];
+  $("msgs").innerHTML=M.map(function(m,i){return '<div class="msg"><b>'+m[0]+'<button class="sm" data-cp="'+i+'">Copy</button></b><p>'+esc(m[1])+'</p></div>'}).join("");
+  window._M=M;save()}
+
+document.addEventListener("click",function(e){
+  var t=e.target;
+  if(t.dataset.add!==undefined){var it=S.pb[+t.dataset.add];var ex=S.ln.filter(function(l){return l.n===it.n})[0];if(ex)ex.q=(+ex.q||0)+1;else S.ln.push({n:it.n,q:1,p:it.p});rLines()}
+  else if(t.dataset.del!==undefined){S.pb.splice(+t.dataset.del,1);rPB();save()}
+  else if(t.dataset.rm!==undefined){S.ln.splice(+t.dataset.rm,1);rLines()}
+  else if(t.dataset.cp!==undefined){var s=window._M[+t.dataset.cp][1];(navigator.clipboard?navigator.clipboard.writeText(s):Promise.reject()).then(function(){toast("Copied")},function(){toast("Select the text to copy it")})}
+});
+$("lines").addEventListener("input",function(e){var t=e.target,l=S.ln[+t.dataset.i];if(!l)return;l[t.dataset.f]=t.dataset.f==="n"?t.value:(t.value===""?0:+t.value);rOut()});
+[["co","co"],["cu","cu"],["jb","jb"],["tx","tx"],["tone","tone"]].forEach(function(p){$(p[0]).addEventListener("input",function(){S[p[1]]=$(p[0]).value;rOut()})});
+$("custom").onclick=function(){S.ln.push({n:"Custom item",q:1,p:0});rLines()};
+$("draft").onclick=function(){
+  var txt=" "+$("jb").value.toLowerCase().replace(/[^a-z0-9- ]/g," ")+" ",n=0;
+  S.pb.forEach(function(it){var hit=it.k&&it.k.split(" ").some(function(w){return w&&txt.indexOf(" "+w+" ")>-1||(w.length>5&&txt.indexOf(w)>-1)});
+    if(hit&&!S.ln.some(function(l){return l.n===it.n})){S.ln.push({n:it.n,q:1,p:it.p});n++}});
+  rLines();toast(n?("Added "+n+" line"+(n>1?"s":"")):"No matches. Add items from the price book.")};
+$("addf").onsubmit=function(e){e.preventDefault();S.pb.push({n:$("an").value.trim(),p:+$("ap").value,k:""});$("an").value="";$("ap").value="";rPB();save()};
+$("print").onclick=function(){window.print()};
+$("reset").onclick=function(){S.cu="";S.jb="";S.ln=[];$("cu").value="";$("jb").value="";rLines();toast("Started a new quote")};
+$("co").value=S.co;$("cu").value=S.cu;$("jb").value=S.jb;$("tx").value=S.tx;$("tone").value=S.tone;
+rPB();rLines();
+</script>
+</body>
+</html>
