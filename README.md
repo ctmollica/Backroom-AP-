@@ -74,4 +74,4 @@ Quote data and the price book are saved in the browser's `localStorage`. Nothing
 
 ## License
 
-TBD
+Yes, see MIT License
